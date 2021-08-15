@@ -59,9 +59,9 @@ app.post("/api/users/:_id/exercises", function (req, res, next) {
     if (err) throw err;
     if (!!user) {
       let exercise = {
+        date: req.body.date ? req.body.date : Date.now(),
+        duration: Number(req.body.duration),
         description: req.body.description,
-        duration: req.body.duration,
-        date: req.body.date || Date.now(),
       };
       if (user.log) {
         user.log.push(exercise);
