@@ -91,8 +91,6 @@ app.get("/api/users/:id/logs", function (req, res, next) {
   const userId = new mongo.ObjectId(req.params.id);
   const queryOptions = {};
   if (req.query.limit) Object.assign(queryOptions, { $limit: req.query.limit });
-  // if (req.query.from) Object.assign(queryOptions, { $limit: req.query.limit })
-  // if (req.query.to) Object.assign(queryOptions, { $limit: req.query.limit })
   dbo
     .collection("users")
     .findOne({ _id: userId }, queryOptions, function (err, user) {
