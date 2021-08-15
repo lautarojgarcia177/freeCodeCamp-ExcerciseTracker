@@ -3,7 +3,6 @@ const app = express();
 const cors = require("cors");
 require("dotenv").config();
 let mongo = require("mongodb");
-const dateformat = require('dateformat');
 
 let MongoClient = mongo.MongoClient;
 const uri = `mongodb+srv://lautarojgarcia177:${process.env.MONGODBATLASPASSWORD}@freecodecamptuotrialclu.na94p.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
@@ -54,12 +53,14 @@ app.post("/api/users", (req, res, next) => {
 });
 
 app.post("/api/users/:_id/exercises", function (req, res, next) {
+  if (!req.body.duration) res.status(400).send('Path `duration` is required.');
+  if (!req.body.description) res.status(400).send('Path `description` is required.');
   const userId = new mongo.ObjectId(req.params._id);
   dbo.findOne({ _id: userId }, async function (err, user) {
     if (err) throw err;
     if (!!user) {
       let exercise = {
-        date: req.body.date ? req.body.date : Date.now(),
+        date: !!req.body.date ? new Date(req.body.date) : Date.now(),
         duration: Number(req.body.duration),
         description: req.body.description,
       };
@@ -69,7 +70,8 @@ app.post("/api/users/:_id/exercises", function (req, res, next) {
         user.log = [exercise];
       }
       const replacedUser = await dbo.findOneAndReplace({ _id: userId }, user);
-      exercise.date = dateformat(exercise.date, 'dddd mmmm d yyyy')
+      const formattedDate = new Date(exercise.date).toDateString();
+      exercise.date = formattedDate;
       const response = {
         _id: replacedUser.value._id,
         username: replacedUser.value.username,
